@@ -2,6 +2,16 @@ use crate::{OptaModel, Result};
 use burn::tensor::{Tensor, backend::Backend};
 use rand::Rng;
 
+/// Statistics from layout optimization run
+#[derive(Debug, Clone)]
+pub struct OptimizationStats {
+    pub iterations: usize,
+    pub final_temperature: f32,
+    pub duration_ms: u64,
+    pub node_count: usize,
+    pub edge_count: usize,
+}
+
 /// Force-directed layout optimizer using Fruchterman-Reingold algorithm
 ///
 /// Positions nodes in 2D space by simulating physical forces:
@@ -68,6 +78,36 @@ impl<B: Backend> OptaOptimizer<B> {
         Ok(())
     }
 
+    /// Optimize node positions with optional telemetry logging
+    #[cfg(feature = "telemetry")]
+    pub fn optimize_layout_with_telemetry(
+        &self,
+        model: &mut OptaModel<B>,
+        logger: Option<&crate::telemetry::TelemetryLogger>,
+    ) -> Result<()> {
+        let start = std::time::Instant::now();
+        let node_count = model.node_count();
+        let edge_count = model.edge_count();
+
+        self.optimize_layout(model)?;
+
+        if let Some(logger) = logger {
+            let duration_ms = start.elapsed().as_millis() as u64;
+            // Calculate final temperature: last iteration of cooling schedule
+            let cooling = 1.0 - ((self.iterations - 1) as f32 / self.iterations as f32);
+            let final_temp = self.learning_rate * cooling;
+
+            logger.log_layout_converged(
+                self.iterations,
+                final_temp,
+                duration_ms,
+                node_count,
+                edge_count,
+            )?;
+        }
+
+        Ok(())
+    }
     fn initialize_positions(&self, count: usize, device: &B::Device) -> Tensor<B, 2> {
         let mut rng = rand::rng();
         let mut positions = Vec::with_capacity(count * 2);

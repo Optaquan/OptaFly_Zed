@@ -23,18 +23,25 @@ thiserror = { workspace = true }
 # Utilities
 log = { workspace = true }
 rand = { workspace = true }
+regex = { workspace = true }
+
+# Telemetry (optional)
+uuid = { version = "1.0", features = ["v4"], optional = true }
 
 # WASM bindings (optional)
 wasm-bindgen = { version = "0.2", optional = true }
 js-sys = { version = "0.3", optional = true }
 web-sys = { version = "0.3", optional = true, features = ["console"] }
 console_error_panic_hook = { version = "0.1", optional = true }
-regex.workspace = true
+
+[dev-dependencies]
+tempfile = "3.8"
 
 [features]
 default = ["ndarray"]
 ndarray = []
 wgpu = ["burn/wgpu"]
+telemetry = ["uuid"]
 wasm = ["wasm-bindgen", "js-sys", "web-sys", "console_error_panic_hook"]
 
 [lints]
