@@ -1,0 +1,25 @@
+[package]
+name = "optacore_jni"
+version = "0.1.0"
+edition = "2021"
+authors = ["OptaFly Team"]
+description = "JNI bridge for OptaCore - enables Structurizr Java plugin integration"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]  # Dynamic library for JNI
+path = "src/lib.rs"
+
+[dependencies]
+jni = "0.21"
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+optacore_struct = { path = "../optacore_struct" }
+burn = { version = "0.19.1", default-features = false, features = ["ndarray"] }
+
+[build-dependencies]
+cc = "1.0"
+
+[lints]
+workspace = true

@@ -12731,6 +12731,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "optacore_jni"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "burn 0.19.1",
+ "cc",
+ "jni",
+ "optacore_struct",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "optacore_struct"
 version = "0.1.0"
 dependencies = [
