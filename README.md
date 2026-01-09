@@ -157,6 +157,32 @@ choco install rust python graphviz
 
 **That's it!** Widget-Log starts automatically and begins caching your AI interactions. 🎉
 
+---
+
+### First-Time Setup Flow
+
+```mermaid
+flowchart TD
+    A[Clone OptaFly_Zed] --> B{Dependencies Installed?}
+    B -->|No| C[Run install-phase25-parallel.sh]
+    B -->|Yes| D[cargo build --release]
+    C --> E{Auto-install Success?}
+    E -->|Yes| D
+    E -->|No| F[Manual Install: See Prerequisites]
+    F --> D
+    D --> G[Configure API Key in ~/.local/share/optafly-zed/widget-log/.env]
+    G --> H[Start Widget-Log: ./widget-log/start-proxy.sh]
+    H --> I[Launch OptaFly_Zed: ./target/release/zed]
+    I --> J{Proxy Running?}
+    J -->|Yes| K[✅ Semantic Caching Active - Ready!]
+    J -->|No| L[Check logs: tail -f ~/.local/share/optafly-zed/widget-log/logs/widget-log.log]
+    L --> M[Fix issues, restart proxy]
+    M --> J
+    
+    style K fill:#90EE90
+    style L fill:#FFB6C1
+```
+
 ### First-Time Setup (Automatic)
 
 On first run, OptaFly_Zed automatically:
