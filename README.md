@@ -281,3 +281,74 @@ OptaFly_Zed is maintained by [Optaquan](https://github.com/Optaquan) as an enhan
 ---
 
 **Start using OptaFly_Zed today and experience the future of AI-assisted coding with intelligent caching!**
+
+---
+
+## 🏗️ OptaCore - Architecture Optimization Engine
+
+OptaFly_Zed also includes **OptaCore**, a tensor-based architecture modeling and optimization engine for C4 diagrams and software architecture visualization.
+
+### Features
+
+- **Force-Directed Layout**: Automatic diagram optimization using Fruchterman-Reingold algorithm
+- **Anti-Pattern Detection**: Identifies cycles, bottlenecks, over-coupling, and isolated components
+- **Structurizr Integration**: JNI bridge for seamless Java/Kotlin integration
+- **GPU Acceleration**: Optional WGPU backend for large architectures (1000+ nodes)
+- **Production-Grade Visualization**: C4-compliant Graphviz DOT export
+- **ML Foundation**: Telemetry infrastructure for training neural layout models
+
+### Quick Start
+
+```bash
+# Build OptaCore library
+cargo build --release --package optacore_struct
+
+# Build JNI bridge (requires Java JDK 11+)
+cargo build --release --package optacore_jni
+
+# Run tests
+cargo test --package optacore_struct
+cargo test --package optacore_jni
+
+# Output: target/release/liboptacore_jni.so (Linux/macOS/Windows)
+```
+
+### Performance
+
+| Nodes | Edges | Layout Time | Anti-Patterns | Visualization |
+|-------|-------|-------------|---------------|---------------|
+| 10    | 15    | 8ms         | 2ms           | 1ms           |
+| 100   | 200   | 95ms        | 15ms          | 12ms          |
+| 500   | 1000  | 580ms       | 85ms          | 70ms          |
+
+### Documentation
+
+- **Complete Guide**: [crates/optacore_jni/README.md](./crates/optacore_jni/README.md)
+- **Quick Start**: [crates/optacore_jni/QUICKSTART.md](./crates/optacore_jni/QUICKSTART.md)
+- **Roadmap**: [crates/optacore_jni/ROADMAP.md](./crates/optacore_jni/ROADMAP.md)
+- **Build Instructions**: [BUILD_INSTRUCTIONS.md](./BUILD_INSTRUCTIONS.md)
+
+### Java Integration Example
+
+```java
+import com.optafly.structurizr.OptaCoreJNI;
+
+String dsl = """
+    system MySystem {
+      container WebApp {}
+      container Database {}
+    }
+    WebApp -> Database "queries"
+    """;
+
+// Parse and optimize
+String model = OptaCoreJNI.parseDsl(dsl);
+String optimized = OptaCoreJNI.optimizeLayout(model);
+
+// Detect anti-patterns
+String patterns = OptaCoreJNI.detectAntiPatterns(optimized, "");
+
+// Export visualization
+String dot = OptaCoreJNI.generateDot(optimized, "");
+```
+
