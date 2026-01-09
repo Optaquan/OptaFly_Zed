@@ -3,12 +3,11 @@ pub mod conversions;
 pub mod types;
 
 use anyhow::Result;
-use pyo3::prelude::*;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
 pub use bridge::PyO3Bridge;
-pub use types::{ProxyRequest, ProxyResponse, CacheStatus};
+pub use types::{CacheStatus, ProxyRequest, ProxyResponse};
 
 /// Initialize PyO3 and prepare Python interpreter
 pub fn initialize_python() -> Result<()> {
