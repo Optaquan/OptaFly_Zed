@@ -196,6 +196,7 @@ members = [
     "crates/web_search",
     "crates/web_search_providers",
     "crates/workspace",
+    "crates/widget_log_integration",
     "crates/worktree",
     "crates/x_ai",
     "crates/zed",

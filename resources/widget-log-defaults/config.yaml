@@ -1,0 +1,44 @@
+# OptaFly_Zed Default Widget-Log Configuration
+cache:
+  enabled: true
+  local_priority: true
+  similarity_threshold: 0.85
+  max_size_gb: 5
+  ttl_days: 30
+
+projects:
+  fuzzy_match_distance: 2
+  acronym_matching: true
+  auto_create_folders: true
+
+performance:
+  max_parallel_cache_checks: 10
+  cache_lookup_timeout_ms: 100
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  use_gpu: false
+  lru_cache_size: 1000
+
+anthropic:
+  model: "claude-opus-4-20250514"
+  max_tokens: 8192
+  prompt_caching: true
+  temperature: 1.0
+  cache_anchors:
+    max_anchors: 4
+    min_tokens_per_anchor: 1024
+    total_min_tokens: 2048
+  session:
+    context_window: 200000
+    optimal_cache_size: 150000
+    anchor_positions:
+      - "system_prompt"
+      - "project_context"
+      - "conversation_history"
+      - "code_context"
+
+logging:
+  level: "INFO"
+  external_cache_tracking: true
+  performance_metrics: true
+  log_file: "logs/widget-log.log"
+  max_log_size_mb: 100
