@@ -9,6 +9,7 @@ pub fn to_dot<B: Backend>(
 ) -> crate::Result<String> {
     let mut dot = String::from("digraph Architecture {\n");
     dot.push_str("  rankdir=TB;\n");
+    dot.push_str("  bgcolor=\"#f8f8f8\";\n");
     dot.push_str("  splines=curved;\n");
     dot.push_str("  node [style=filled, fontsize=10, fontcolor=\"#333333\"];\n");
     dot.push_str("  edge [penwidth=1.5];\n\n");
@@ -33,12 +34,23 @@ pub fn to_dot<B: Backend>(
         } else {
             "filled"
         };
+        let is_in_cycle = cycle_nodes.contains(&node.id);
         let label = format!("{}", node.name);
 
         dot.push_str(&format!(
             "  \"{}\" [label=\"{}\", fillcolor=\"{}\", shape={}, style=\"{}\"",
             node.id, label, color, shape, style
         ));
+
+        // Bold font for high-severity nodes
+        if severity >= 0.7 {
+            dot.push_str(", fontweight=\"bold\"");
+        }
+
+        // Double border (glow effect) for nodes in cycles
+        if is_in_cycle {
+            dot.push_str(", peripheries=2");
+        }
 
         if severity > 0.0 {
             dot.push_str(&format!(", tooltip=\"Severity: {:.2}\"", severity));
@@ -118,6 +130,7 @@ pub fn to_dot<B: Backend>(
 pub fn to_dot_with_positions<B: Backend>(model: &OptaModel<B>) -> crate::Result<String> {
     let mut dot = String::from("graph Architecture {\n");
     dot.push_str("  layout=neato;\n");
+    dot.push_str("  bgcolor=\"#f8f8f8\";\n");
     dot.push_str("  node [style=filled, fixedsize=true, width=1.5, height=0.8, fontsize=10, fontcolor=\"#333333\"];\n\n");
 
     for node in &model.nodes {
@@ -234,6 +247,7 @@ mod tests {
         let dot = to_dot(&model, None).unwrap();
         assert!(dot.contains("digraph Architecture"));
         assert!(dot.contains("splines=curved"));
+        assert!(dot.contains("bgcolor=\"#f8f8f8\""));
     }
 
     #[test]
