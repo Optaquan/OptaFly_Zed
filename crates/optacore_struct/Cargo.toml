@@ -1,0 +1,40 @@
+[package]
+name = "optacore_struct"
+version = "0.1.0"
+publish.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+# Burn framework for tensor operations (0.19.1 stable)
+burn = { version = "0.19.1", default-features = false, features = ["ndarray", "autodiff"] }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+
+# Utilities
+log = { workspace = true }
+rand = { workspace = true }
+
+# WASM bindings (optional)
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", optional = true, features = ["console"] }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+[features]
+default = ["ndarray"]
+ndarray = []
+wgpu = ["burn/wgpu"]
+wasm = ["wasm-bindgen", "js-sys", "web-sys", "console_error_panic_hook"]
+
+[lints]
+workspace = true
