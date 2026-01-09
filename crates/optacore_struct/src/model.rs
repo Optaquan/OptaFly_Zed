@@ -159,6 +159,10 @@ impl<B: Backend> OptaModel<B> {
     pub fn find_node_mut(&mut self, id: &str) -> Option<&mut OptaNode<B>> {
         self.nodes.iter_mut().find(|n| n.id == id)
     }
+
+    pub fn detect_anti_patterns_default(&self) -> crate::Result<Vec<crate::anti_patterns::AntiPattern>> {
+        crate::anti_patterns::detect_anti_patterns(self, &crate::anti_patterns::AntiPatternConfig::default())
+    }
 }
 
 impl<B: Backend> Default for OptaModel<B> {

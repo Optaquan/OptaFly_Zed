@@ -48,7 +48,10 @@ pub mod parser;
 #[cfg(feature = "wasm")]
 pub mod wasm;
 
-pub use anti_patterns::{AntiPattern, detect_anti_patterns};
+#[cfg(test)]
+mod integration_tests;
+
+pub use anti_patterns::{AntiPattern, AntiPatternConfig, detect_anti_patterns};
 pub use model::{NodeType, OptaModel, OptaNode};
 pub use optimizer::OptaOptimizer;
 pub use parser::parse_c4_dsl;
