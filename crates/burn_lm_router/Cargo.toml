@@ -1,0 +1,37 @@
+[package]
+name = "burn_lm_router"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# Burn deep learning framework (optional, will be integrated in Phase 2c)
+# Using minimal features to avoid sqlite dependency conflicts with Zed
+burn = { version = "0.14", default-features = false, features = ["ndarray"], optional = true }
+burn-ndarray = { version = "0.14", default-features = false, optional = true }
+
+# Async runtime
+tokio = { version = "1.40", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+log = "0.4"
+
+# Types from other crates
+pyo3_bridge = { path = "../pyo3_bridge" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[features]
+default = []
+burn-neural-networks = ["burn", "burn-ndarray"]

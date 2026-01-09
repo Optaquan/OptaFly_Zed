@@ -1,9 +1,13 @@
-mod lifecycle;
 mod config;
+pub mod integrated_config;
+mod lifecycle;
+pub mod prompt_manager;
 mod zed_config;
 
-pub use lifecycle::WidgetLogProcess;
 pub use config::WidgetLogConfig;
+pub use integrated_config::IntegratedConfig;
+pub use lifecycle::WidgetLogProcess;
+pub use prompt_manager::{AgenticResponse, IntegratedPromptManager, ManagerStats};
 
 use anyhow::Result;
 
@@ -67,10 +71,8 @@ impl WidgetLogManager {
         if let Some(process) = &mut self.process {
             process.start(self.config.widget_log_dir.clone()).await?;
         } else {
-            let mut process = WidgetLogProcess::new(
-                self.config.proxy_port,
-                self.config.proxy_host.clone(),
-            );
+            let mut process =
+                WidgetLogProcess::new(self.config.proxy_port, self.config.proxy_host.clone());
             process.start(self.config.widget_log_dir.clone()).await?;
             self.process = Some(process);
         }
@@ -108,7 +110,10 @@ impl WidgetLogManager {
                 .build()?;
 
             let auth_token = zed_config::get_auth_token(&self.config.widget_log_dir).await?;
-            let url = format!("{}:/{}:{}/stats", "https", self.config.proxy_host, self.config.proxy_port);
+            let url = format!(
+                "{}:/{}:{}/stats",
+                "https", self.config.proxy_host, self.config.proxy_port
+            );
 
             let response = client
                 .get(&url)
