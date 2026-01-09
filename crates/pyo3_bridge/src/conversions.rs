@@ -2,7 +2,7 @@ use anyhow::Result;
 use pyo3::prelude::*;
 use pyo3::types::PyDict;
 
-use crate::types::{CacheAnchor, ProxyRequest, ProxyResponse, TokenOptimization};
+use crate::types::{ProxyRequest, ProxyResponse};
 
 /// Convert Rust ProxyRequest to Python dict
 pub fn request_to_pydict<'py>(py: Python<'py>, request: &ProxyRequest) -> Result<&'py PyDict> {
