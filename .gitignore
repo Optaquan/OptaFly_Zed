@@ -41,4 +41,60 @@ xcuserdata/
 .env.secret.toml
 
 # `nix build` output
-/result 
+/result
+
+# OptaFly-specific build artifacts
+*.log
+*.tmp
+*.cache
+*.bak
+*~
+.*.swp
+.*.swo
+
+# Widget-Log artifacts
+widget-log/__pycache__/
+widget-log/*.pyc
+widget-log/.pytest_cache/
+widget-log/logs/*.log
+widget-log/cache/
+widget-log/.coverage
+widget-log/htmlcov/
+
+# OptaCore build artifacts
+crates/optacore_struct/target/
+crates/optacore_jni/target/
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# Temporary API keys and secrets (already removed from repo)
+Temp-API-Key/
+**/temp-keys/
+**/.api-keys/
+
+# IDE and editor files
+.idea/
+*.iml
+.vscode/settings.json
+.vscode/launch.json
+
+# OS-specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Documentation build
+docs/_build/
+docs/.doctrees/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Performance profiling
+*.prof
+*.perf
+.perf-runs
