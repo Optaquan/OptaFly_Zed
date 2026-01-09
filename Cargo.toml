@@ -226,7 +226,7 @@ members = [
     #
 
     "tooling/perf",
-    "tooling/xtask",
+    "tooling/xtask", "crates/optacore_struct",
 ]
 default-members = ["crates/zed"]
 
