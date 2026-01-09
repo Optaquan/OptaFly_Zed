@@ -44,6 +44,10 @@ pub mod anti_patterns;
 pub mod model;
 pub mod optimizer;
 pub mod parser;
+pub mod viz;
+
+#[cfg(feature = "telemetry")]
+pub mod telemetry;
 
 #[cfg(feature = "wasm")]
 pub mod wasm;
@@ -52,9 +56,12 @@ pub mod wasm;
 mod integration_tests;
 
 pub use anti_patterns::{AntiPattern, AntiPatternConfig, detect_anti_patterns};
+#[cfg(feature = "telemetry")]
+pub use anti_patterns::detect_anti_patterns_with_telemetry;
 pub use model::{NodeType, OptaModel, OptaNode};
-pub use optimizer::OptaOptimizer;
+pub use optimizer::{OptaOptimizer, OptimizationStats};
 pub use parser::parse_c4_dsl;
+pub use viz::{to_dot, to_dot_with_positions};
 
 pub type Result<T> = std::result::Result<T, anyhow::Error>;
 

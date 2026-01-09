@@ -243,6 +243,53 @@ fn detect_isolated_components<B: Backend>(
         .collect()
 }
 
+
+/// Detect anti-patterns with optional telemetry logging
+#[cfg(feature = "telemetry")]
+pub fn detect_anti_patterns_with_telemetry<B: Backend>(
+    model: &OptaModel<B>,
+    config: &AntiPatternConfig,
+    logger: Option<&crate::telemetry::TelemetryLogger>,
+) -> Result<Vec<AntiPattern>> {
+    let patterns = detect_anti_patterns(model, config)?;
+
+    if let Some(logger) = logger {
+        for pattern in &patterns {
+            match pattern {
+                AntiPattern::Cycle { nodes } => {
+                    logger.log_pattern_detected(
+                        "cycle".to_string(),
+                        1.0,
+                        nodes.clone(),
+                    )?;
+                }
+                AntiPattern::Bottleneck { node_id, severity, .. } => {
+                    logger.log_pattern_detected(
+                        "bottleneck".to_string(),
+                        *severity,
+                        vec![node_id.clone()],
+                    )?;
+                }
+                AntiPattern::IsolatedComponent { node_id } => {
+                    logger.log_pattern_detected(
+                        "isolated".to_string(),
+                        0.5,
+                        vec![node_id.clone()],
+                    )?;
+                }
+                AntiPattern::OverCoupling { node_id, severity, .. } => {
+                    logger.log_pattern_detected(
+                        "over_coupling".to_string(),
+                        *severity,
+                        vec![node_id.clone()],
+                    )?;
+                }
+            }
+        }
+    }
+
+    Ok(patterns)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
