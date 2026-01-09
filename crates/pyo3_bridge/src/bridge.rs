@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+use crate::telemetry::TelemetryEvent;
 use crate::types::{CacheStatus, ProxyRequest, ProxyResponse};
 
 /// High-performance Rust ↔ Python bridge for Widget-Log
@@ -43,6 +44,7 @@ impl PyO3Bridge {
 
         let widget_log_path = self.widget_log_path.clone();
         let py_module_cache = self.py_module.clone();
+        let start_time = std::time::Instant::now();
 
         tokio::task::spawn_blocking(move || {
             Python::with_gil(|py| {
@@ -116,7 +118,21 @@ impl PyO3Bridge {
         .context("Failed to spawn blocking task")??;
 
         *init = true;
-        log::info!("Widget-Log Python module initialized successfully");
+        let duration_ms = start_time.elapsed().as_millis() as u64;
+        log::info!(
+            "Widget-Log Python module initialized successfully in {}ms",
+            duration_ms
+        );
+
+        // Send initialization telemetry (fire-and-forget)
+        let _ = self
+            .send_telemetry(TelemetryEvent::bridge_initialized(
+                self.widget_log_path.display().to_string(),
+                true,
+                duration_ms,
+            ))
+            .await;
+
         Ok(())
     }
 
@@ -296,6 +312,127 @@ impl PyO3Bridge {
         })
         .await
         .context("Failed to spawn blocking task")?
+    }
+
+    /// Send a telemetry event to Widget-Log (fire-and-forget, non-blocking)
+    pub async fn send_telemetry(&self, event: TelemetryEvent) -> Result<()> {
+        // Quick guard: skip if not initialized (telemetry is best-effort)
+        if !*self.initialized.lock().await {
+            log::debug!(
+                "Bridge not initialized, dropping telemetry event: {:?}",
+                event.event_name()
+            );
+            return Ok(());
+        }
+
+        let py_module_cache = self.py_module.clone();
+
+        // Serialize early — cheap and allows early failure detection
+        let event_json = match serde_json::to_string(&event) {
+            Ok(json) => json,
+            Err(e) => {
+                log::warn!("Failed to serialize telemetry event: {}", e);
+                return Ok(());
+            }
+        };
+
+        // Fire-and-forget: spawn a lightweight task
+        tokio::task::spawn(async move {
+            let result = tokio::task::spawn_blocking(move || {
+                Python::with_gil(|py| {
+                    let module_handle: Option<Py<PyModule>> = {
+                        let cached = py_module_cache.blocking_lock();
+                        cached.as_ref().map(|m| m.clone_ref(py))
+                    };
+
+                    let widget_log: &PyModule = match &module_handle {
+                        Some(handle) => handle.as_ref(py),
+                        None => {
+                            // Fallback import — rare, but safe
+                            match PyModule::import(py, "widget_log_proxy") {
+                                Ok(m) => m,
+                                Err(_) => return,
+                            }
+                        }
+                    };
+
+                    let event_py_obj = PyString::new(py, &event_json);
+
+                    // Call Widget-Log's log_event function
+                    if let Err(e) = widget_log
+                        .getattr("log_event")
+                        .and_then(|f| f.call1((event_py_obj,)))
+                    {
+                        log::debug!("Failed to send telemetry (non-critical): {}", e);
+                    }
+                })
+            })
+            .await;
+
+            if let Err(e) = result {
+                log::debug!("Telemetry task panicked or failed: {}", e);
+            }
+        });
+
+        Ok(())
+    }
+
+    /// Send telemetry and wait for completion (blocking version for critical events)
+    pub async fn send_telemetry_critical(&self, event: TelemetryEvent) -> Result<()> {
+        if !*self.initialized.lock().await {
+            log::debug!(
+                "Bridge not initialized, dropping critical telemetry event: {:?}",
+                event.event_name()
+            );
+            return Ok(());
+        }
+
+        let py_module_cache = self.py_module.clone();
+        let event_json =
+            serde_json::to_string(&event).context("Failed to serialize telemetry event")?;
+
+        tokio::task::spawn_blocking(move || {
+            Python::with_gil(|py| {
+                let module_handle: Option<Py<PyModule>> = {
+                    let cached = py_module_cache.blocking_lock();
+                    cached.as_ref().map(|m| m.clone_ref(py))
+                };
+
+                let widget_log: &PyModule = match &module_handle {
+                    Some(handle) => handle.as_ref(py),
+                    None => PyModule::import(py, "widget_log_proxy")
+                        .context("Failed to import widget_log_proxy")?,
+                };
+
+                let event_py_obj = PyString::new(py, &event_json);
+
+                widget_log
+                    .getattr("log_event")
+                    .context("widget_log_proxy.log_event not found")?
+                    .call1((event_py_obj,))
+                    .context("log_event() call failed")?;
+
+                Ok::<(), anyhow::Error>(())
+            })
+        })
+        .await
+        .context("Failed to spawn blocking task")??;
+
+        Ok(())
+    }
+
+    /// Send a critical error event (convenience wrapper)
+    pub async fn send_critical_error(
+        &self,
+        operation: impl Into<String>,
+        message: impl Into<String>,
+        prompt_id: Option<String>,
+    ) {
+        let _ = self
+            .send_telemetry_critical(TelemetryEvent::bridge_error(
+                operation, "critical", message, prompt_id,
+            ))
+            .await;
     }
 }
 

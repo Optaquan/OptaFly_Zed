@@ -1,5 +1,6 @@
 pub mod bridge;
 pub mod conversions;
+pub mod telemetry;
 pub mod types;
 
 use anyhow::Result;
@@ -7,6 +8,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 pub use bridge::PyO3Bridge;
+pub use telemetry::{CacheMissReason, HealthStatus, TelemetryConfig, TelemetryEvent};
 pub use types::{CacheStatus, ProxyRequest, ProxyResponse};
 
 /// Initialize PyO3 and prepare Python interpreter
