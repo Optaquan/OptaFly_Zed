@@ -17,3 +17,8 @@ log = "0.4"
 rand = "0.8"
 base64 = "0.21"
 chrono = "0.4"
+
+# New multi-agent system dependencies
+prompt_management_agent = { path = "../prompt_management_agent" }
+pyo3_bridge = { path = "../pyo3_bridge" }
+burn_lm_router = { path = "../burn_lm_router" }

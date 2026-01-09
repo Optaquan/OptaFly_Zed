@@ -1,0 +1,35 @@
+[package]
+name = "prompt_management_agent"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+# Mistral.rs for local LLM inference
+mistralrs = { git = "https://github.com/EricLBuehler/mistral.rs.git", optional = true }
+
+# Async runtime
+tokio = { version = "1.40", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+log = "0.4"
+
+# File system and paths
+dirs = "5.0"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[features]
+default = []
+mistral-inference = ["mistralrs"]
