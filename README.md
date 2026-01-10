@@ -1,6 +1,6 @@
 # OptaFly_Zed
 
-[![OptaFly_Zed](https://img.shields.io/badge/version-0.1.0-blue)](https://github.com/Optaquan/OptaFly_Zed)
+[![OptaFly_Zed](https://img.shields.io/badge/version-1.0.0-blue)](https://github.com/Optaquan/OptaFly_Zed)
 [![Widget-Log](https://img.shields.io/badge/Widget--Log-integrated-green)](https://github.com/Optaquan/Widget-Log)
 [![Zed](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/zed-industries/zed/main/assets/badge/v0.json)](https://zed.dev)
 [![CI](https://github.com/zed-industries/zed/actions/workflows/run_tests.yml/badge.svg)](https://github.com/zed-industries/zed/actions/workflows/run_tests.yml)
@@ -41,6 +41,33 @@ OptaFly_Zed comes with intelligent AI caching that automatically provides:
 
 ---
 
+## 📦 Version 1.0.0 - Stable Release
+
+**OptaFly_Zed v1.0.0** is now available! This release includes:
+- ✅ **Pinned Dependencies**: Rust 1.91.1, Python 3.12+ with exact package versions
+- ✅ **Cross-Platform Installers**: One-click setup for Linux, macOS, and Windows
+- ✅ **Comprehensive Documentation**: Complete INSTALL.md with troubleshooting guides
+- ✅ **Production Ready**: All Phase 2.5 features stable and tested
+
+**Installation:**
+```bash
+git clone https://github.com/Optaquan/OptaFly_Zed.git
+cd OptaFly_Zed
+
+# Linux
+./install.sh
+
+# macOS
+./install-macos.sh
+
+# Windows (PowerShell as Administrator)
+.\install-windows.ps1
+```
+
+**See [INSTALL.md](INSTALL.md) for detailed platform-specific instructions.**
+
+---
+
 ## 🚀 Quick Start
 
 ### One-Click Installation (Recommended)
@@ -50,8 +77,8 @@ For the fastest setup with automatic dependency management:
 ```bash
 git clone https://github.com/Optaquan/OptaFly_Zed.git
 cd OptaFly_Zed
-chmod +x install-phase25-parallel.sh
-./install-phase25-parallel.sh
+chmod +x install.sh
+./install.sh
 ```
 
 This script automatically:
@@ -164,7 +191,7 @@ choco install rust python graphviz
 ```mermaid
 flowchart TD
     A[Clone OptaFly_Zed] --> B{Dependencies Installed?}
-    B -->|No| C[Run install-phase25-parallel.sh]
+    B -->|No| C[Run install.sh]
     B -->|Yes| D[cargo build --release]
     C --> E{Auto-install Success?}
     E -->|Yes| D
